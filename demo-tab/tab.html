@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Tab选项卡切换-js面向对象</title>
+	 <link rel="stylesheet" href="css/tab.css">
+	 <script src='js/jquery-1.11.3.js'></script>
+	 <script src='js/tab.js'></script>
+</head>
+<body>
+   <div style='display:flex;'>
+	<div class="js-tab tab" data-config='{ "triggerType":"mouseover",
+											"effect" :"fade",
+											"invoke" :1,
+											"auto"   :"1000"}'>	
+			<ul class="tab-nav"> 
+				<li class="tab-pane active"><a href="">新闻</a></li>
+				<li class="tab-pane"><a href="">娱乐</a></li>
+				<li class="tab-pane"><a href="">电影</a></li>
+				<li class="tab-pane"><a href="">科技</a></li>
+			</ul>	
+
+		<div class="tab-content">
+			<div class="content-item current"><img src="img/banner_01.jpg"></div>
+			<div class="content-item"><img src="img/banner_02.jpg"></div>
+			<div class="content-item"><img src="img/banner_03.jpg"></div>
+			<div class="content-item"><img src="img/banner_04.jpg"></div>
+		</div>
+	</div>
+
+
+	<div class="js-tab tab">
+		<div>
+			<ul class="tab-nav"> 
+				<li class="tab-pane active"><a href="">新闻</a></li>
+				<li class="tab-pane"><a href="">娱乐</a></li>
+				<li class="tab-pane"><a href="">电影</a></li>
+				<li class="tab-pane"><a href="">科技</a></li>
+			</ul>	
+		</div>
+	
+		<div class="tab-content">
+			<div class="content-item current"><img src="img/banner_01.jpg"></div>
+			<div class="content-item"><img src="img/banner_02.jpg"></div>
+			<div class="content-item"><img src="img/banner_03.jpg"></div>
+			<div class="content-item"><img src="img/banner_04.jpg"></div>
+		</div>
+	</div>
+	
+	
+	
+	
+	<div class="js-tab tab" 
+			 data-config='{
+			 "triggerType":"click",
+			 "invoke" :3}'>
+			<div>
+				<ul class="tab-nav"> 
+					<li class="tab-pane active"><a href="">新闻</a></li>
+					<li class="tab-pane"><a href="">娱乐</a></li>
+					<li class="tab-pane"><a href="">电影</a></li>
+					<li class="tab-pane"><a href="">科技</a></li>
+				</ul>	
+			</div>
+	
+			<div class="tab-content">
+				<div class="content-item current"><img src="img/banner_01.jpg"></div>
+				<div class="content-item"><img src="img/banner_02.jpg"></div>
+				<div class="content-item"><img src="img/banner_03.jpg"></div>
+				<div class="content-item"><img src="img/banner_04.jpg"></div>
+			</div>
+		</div>
+ </div>
+
+
+
+
+<script>
+   
+	$(function(){
+	 // var Tab1=new Tab($('.js-tab:eq(0)'));
+	 // var Tab2=new Tab($('.js-tab:eq(1)'));
+	 // var Tab3=new Tab($('.js-tab:eq(2)'));
+
+	 // Tab.init($('.js-tab'));
+
+	 $('.js-tab').tab();
+
+
+	})
+
+</script>
+</body>
+</html>
