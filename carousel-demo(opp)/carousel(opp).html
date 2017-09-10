@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>轮播 opp</title>
+<script src='jquery-1.11.3.js'></script>
+<style>
+	div.banner{
+		border:1px solid red;
+		height:500px;
+		position:relative;
+	}
+	ul,li{
+		margin:0;
+		padding:0;
+		list-style:none;
+	}
+
+	div.banner ul li{
+		height:100%;
+		width:100%;
+		position:absolute;
+		color:red;
+		font-size:4rem;
+		text-align: center;
+		line-height:500px;
+		display:none;
+	}
+	.banner .indicator {
+	    position: absolute;
+	    width: 100%;
+	    left:0;
+	    bottom:24px;
+	    text-align: center;
+	    z-index: 20;
+	}
+	.banner .indicator a {
+	    display: inline-block;
+	    width: 14px;
+	    height: 14px;
+	    border-radius: 50%;
+	    background: #ccc;
+	    margin: 5px;
+	}
+	.banner .indicator a.cur {
+	    background: #f90;
+	}
+
+	.cut{
+		width:50px;
+		height:50px;
+		background-color: #ddd;
+		position:absolute;
+		display:block;
+		z-index:100;
+		cursor:pointer;
+		text-align:center;
+		color:block;
+		font-size: 20px;
+		line-height: 50px;
+	}
+	.prev{
+		top:50%;
+		transform: translateY(-50%);
+		left:20px;
+	}
+	.next{
+		right:20px;
+		top:50%;
+		transform: translateY(-50%);
+	}
+
+
+</style>
+</head>
+<body>
+	<div class="banner" data-config='{
+									  "number":3,
+									  "cur":"0",
+									  "time":2000
+										}'>
+		<ul>
+			<li style="background-color:green;display: block;z-index: 20;">1</li>
+			<li style="background-color:yellow;">2</li>
+			<li style="background-color:black;">3</li>
+		</ul>
+
+		<!-- 左右箭头 -->
+		<span class='cut prev'> <- </span>
+		<span class='cut next'> -></span>
+		<!-- 小圆点指示器 -->
+		<div class="indicator">
+			<a href="" class='cur'></a>
+			<a href=""></a>
+			<a href=""></a>
+		</div>
+	</div>
+
+<script>
+;(function($){
+
+ function Carousel(banner){
+ 	var that=this;
+ 	this.banner=banner;
+ 	this.timer=null;  //定时器
+ 	this.config={
+ 		 number:3,    //轮播项总数
+ 		 cur:0,       //当前选项
+ 		 time:3000    //轮播间隔时间
+ 	}
+ 	this.cur=0;
+    this.loop=0;
+    this.cuts=this.banner.find('.cut');
+   if(this.getConfig()){  //如果配置参数存在 才扩展
+ 		$.extend(this.config,this.getConfig());
+   }
+   if(this.config.time){  //时间存在 才进行轮播
+   	 if(!this.config.timer){
+     	this.autoPlay();
+    	}
+
+    	//鼠标移入 ，移除  控制定时器开关
+    	this.banner.hover(function(){
+    		if (that.timer){
+    			clearInterval(that.timer);
+    			that.timer=null;
+    		}
+    		},function(){
+				that.autoPlay();
+    	});
+
+    	//鼠标移入小圆点 进行转换
+    	var As=this.banner.find('.indicator a');
+    	As.each(function(index,value){
+    		$(this).hover(function(){
+    			$(this).addClass('cur').siblings().removeClass();
+    			that.banner.find('li').eq(index).stop().fadeIn().siblings().stop().fadeOut();
+    		},function(){
+    			that.loop=index;
+    			that.cur=index;
+    		})
+    	})
+    }
+    //点击左右切换
+    this.slideTab();
+ }	
+
+Carousel.prototype={
+	    autoPlay:function(){
+			var that=this;
+			var cur;
+			var number=this.config.number-1;
+			var $lis=this.banner.find('li');
+			 that.timer=window.setInterval(function(){
+			     	cur=that.loop;
+				if (cur<number) {
+					$lis.eq(cur).css('z-index','10').stop().fadeOut();
+					$lis.eq(cur+1).css('z-index','20').stop().fadeIn();
+					$(".indicator a").removeClass().eq(cur+1).addClass("cur");
+					cur++;	
+				}else{
+					$lis.eq(cur).css('z-index','10').stop().fadeOut();
+					$lis.eq(0).css('z-index','20').stop().fadeIn();
+					$(".indicator a").removeClass().eq(0).addClass("cur");	
+					cur=0;
+				}	
+			        that.loop=cur;
+			 },that.config.time);
+
+	    },
+		//  优化 代码整合
+		Slide:function(type,currenCut){
+			var that=this;
+			var number=currenCut.length-1;
+			var $lis=this.banner.find('li');
+		    $lis.eq(that.loop).css('z-index','10').stop().fadeOut();  //共有操作
+			if(type>0){  //下一个
+				if (that.loop<number) {
+					$lis.eq(that.loop+1).css('z-index','20').stop().fadeIn();
+					$(".indicator a").removeClass().eq(that.loop+1).addClass("cur");
+					that.loop++;
+				}else{
+					$lis.eq(0).css('z-index','20').stop().fadeIn();
+					$(".indicator a").removeClass().eq(0).addClass("cur");	
+					that.loop=0;
+				}
+			}else{ //上一个
+				if (that.loop>0) {
+					$lis.eq(that.loop-1).css('z-index','20').stop().fadeIn();
+					$(".indicator a").removeClass().eq(that.loop-1).addClass("cur");
+					that.loop--;
+				}else{
+					$lis.eq(number).css('z-index','20').stop().fadeIn();
+					$(".indicator a").removeClass().eq(number).addClass("cur");	
+					that.loop=number;
+				}
+			}
+		},
+		slideTab:function(){
+			 var that=this;
+			 var cuts=this.banner.find('.cut');
+			 var As=that.banner.find('.indicator a');
+			 cuts.each(function(index,value){
+			 	$(this).on('click',function(){
+			 		if(index=='0'){         //上一个
+			 			if(!that.config.timer){
+						 that.Slide(-1,As);
+						}
+			 		}else{                  //下一个
+			 			if(!that.config.timer){
+						  that.Slide(1,As);
+						}
+			 		}
+			 	})
+			 })
+		},
+		//获取配置参数
+		getConfig:function(){
+			var option_config=this.banner.attr('data-config');
+			if(option_config&&option_config!=''){
+					return $.parseJSON(option_config);
+			}else{
+				return null;
+			}
+		}
+}
+ window.Carousel=Carousel;
+})(jQuery)
+</script>
+<script>
+  C = new Carousel($('.banner:eq(0)'));
+</script>
+</body>
+</html>
