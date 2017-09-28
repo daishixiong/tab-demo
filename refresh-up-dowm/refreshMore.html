@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<title>上/下拉加载更多demo</title>
+	<script src="jquery-1.11.3.js"></script>
+	<style>
+		body{
+			
+		}
+	    ul, li {
+	    	padding:0;
+	    	margin:0;
+	    }
+	    #wrapper{
+	    	position:relative;
+	    	min-height:420px;
+	    }
+	    #wrapper ul{
+	    	margin:0 auto;
+	    	position:absolute;
+    		width:100%;
+    		/*top:0;*/
+    		transition:all 0.2s linear;
+	    }
+		#wrapper ul li{
+			width:100%;
+			height:40px;
+			background-color: #ddd;
+			color:yellow;
+			text-align: center;
+			line-height:40px;
+			border:1px solid black;
+			cursor:pointer;
+		}
+		#wrapper .loading{
+			width:100%;
+			height:80px;
+			text-align: center;
+			color:red;
+			line-height: 80px;
+			display: none;
+		}
+	    #wrapper .loading-dowm{
+			position:absolute;
+			bottom:-80px;
+			display:none;
+		}
+	</style>
+</head>
+<body>
+	<div id="wrapper">  
+			<div class='loading loading-up'>松手刷新</div>
+        <ul class='box'>  
+            <li>row 10</li>  
+            <li>row 9</li>  
+            <li>row 8</li>  
+            <li>row 7</li>  
+            <li>row 6</li>  
+            <li>row 5</li>  
+            <li>row 4</li>  
+            <li>row 3</li>  
+            <li>row 2</li>  
+            <li>row 1</li>  
+        	<div class='loading loading-dowm'>松手刷新</div>
+        </ul>  
+       
+    </div>  
+    <script>  
+    //touchstart: //手指放到屏幕上时触发
+	//touchmove: //手指在屏幕上滑动式触发
+	//touchend: //手指离开屏幕时触发
+	// wrapper.onclick=function(e){
+	// 	console.log(e.clientX);
+	// 	console.log(e.pageX);
+
+	// }
+  var refreshPlug=(function($){
+  	return function(){
+	     var start_spoint={x:0,y:0};  
+	     var end_spoint={x:0,y:0};
+	     var c_top;
+	     var timer=null;
+	 	 wrapper.addEventListener('touchstart',function(e){
+		 	     // console.log(e.targetTouches[0]);
+		 		 // start_spoint.x=e.targetTouches[0].pageX;
+		 		  var  $ul=$('#wrapper ul');
+		 		  var  $loading= $('#wrapper .loading');
+		 		  start_spoint.y=e.targetTouches[0].pageY;
+		 		  $ul.css('top',0);
+	 		 	  $loading.html(`松手刷新`);
+		 });
+		 wrapper.addEventListener('touchmove',function(e){
+		 		//end_spoint.x=e.targetTouches[0].pageX;
+	 		    end_spoint.y=e.targetTouches[0].pageY;
+	 		    c_top=start_spoint.y-end_spoint.y;
+		 		//var c_left=start_spoint.x-end_spoint.x;
+		 		if(c_top<0){     //向下移动
+		 			  move_refresh(-1,$('#wrapper'),c_top,80);
+		 		}else if(c_top>0&&$('#wrapper ul').height()>parseInt(window.screen.height)){  //向上移动
+	                  move_refresh(1,$('#wrapper'),c_top,80);
+		 		}
+		 });
+		 wrapper.addEventListener('touchend',function(e){
+		 			 // console.log('移动结束！');
+		 			 end_refresh($('#wrapper'),c_top,80);
+		 			         
+	 });
+       // 触摸结束         最外层div、鼠标移动的距离、最大下拉
+       function end_refresh(box,changeHeight,maxC_Height){
+       	    var  $box        =box;
+       		var  $loadingUp  =box.find('.loading-up');
+       		var  $loadingDowm=box.find('.loading-dowm');
+       		var  $ul         =box.find('.box')  
+   			if(changeHeight<0) {//     向下拉
+	 			if(-changeHeight>=maxC_Height){
+	 				     $ul.css('top',maxC_Height+'px');
+	 				     $loadingUp.html(`正在加载中......`);
+	 			timer=setTimeout(function(){
+	 					 $loadingUp.css('display','none');
+						 $ul.css('top','0');
+						 $ul.append(`<li>我是新加载来的数据</li>`);
+	 				},500);
+	 			}else{
+	 				     $ul.css('top',0);
+	 			}
+ 			}else if(changeHeight>0){//  向上拉
+ 				if (changeHeight>=maxC_Height){
+	 				     $loadingDowm.html(`正在加载中.....`);
+	 			timer=setTimeout(function(){
+ 						 $loadingDowm.css('display','none');
+						 $ul.css('top','0');
+						 $ul.append(`<li>我是新的上拉加载来的数据</li>`);
+	 				},500)
+	 			 }else{
+	 			 		 $ul.css('top',0);
+	 			 }
+ 			}
+       }
+       //触摸中
+       function move_refresh(type,box,changeHeight,maxC_Height){
+  	        var  $box        =box;
+       		var  $loadingUp  =box.find('.loading-up');
+       		var  $loadingDowm=box.find('.loading-dowm');
+       		var  $ul         =box.find('.box') 
+       		if(type==-1){       //向下移动
+	 			if (-changeHeight>=maxC_Height){
+	 				changeHeight=-maxC_Height;
+	 				$loadingUp.css('display','block');
+	 			}
+	 		        $ul.css('top',-parseInt(changeHeight));
+	 		}else if(type==1){  //向上移动
+                 if (changeHeight>=maxC_Height){
+	 				changeHeight=maxC_Height;
+	 				$loadingDowm.css('display','block');
+	 			  }
+	 			    $ul.css("top",-parseInt(changeHeight));
+	 		}
+       }
+    }
+  })($)
+
+  refreshPlug();
+
+
+
+
+
+
+
+
+
+
+    </script>  
+</body>
+</html>
